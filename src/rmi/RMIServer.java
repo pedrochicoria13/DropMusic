@@ -2,6 +2,7 @@ package rmi;
 import classes.*;
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.rmi.RemoteException;
@@ -20,9 +21,11 @@ public class RMIServer extends UnicastRemoteObject implements RmiClientInterface
 	private static final long serialVersionUID = 1L;
 	private static Registry registry_main;
 	private static int rmi_port;
-	private static String MULTICAST_ADDRESS = "224.0.224.0";
+	private static String MULTICAST_ADDRESS = "224.3.2.1";
     private static int PORT = 4321;
 	private static Scanner keyboardScanner;
+	
+	
     public ArrayList<User> users = new ArrayList<>();
 	
 	protected RMIServer() throws RemoteException {
@@ -44,17 +47,23 @@ public class RMIServer extends UnicastRemoteObject implements RmiClientInterface
 		
 		System.out.println("RMI Server is ready!\n");
         MulticastSocket socket = null;
-        System.out.println( "Connection ready...");
+   
+        long counter = 0;
         try {
             socket = new MulticastSocket();  // create socket without binding it (only for sending)
-            keyboardScanner = new Scanner(System.in);
+        	keyboardScanner = new Scanner(System.in);
+        	
             while (true) {
-                String readKeyboard = keyboardScanner.nextLine();
-                byte[] buffer = readKeyboard.getBytes();
+            	String readKeyboard = keyboardScanner.nextLine();
+            	byte[] buffer = readKeyboard.getBytes();
 
                 InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                 socket.send(packet);
+                
+     
+         
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -70,6 +79,26 @@ public class RMIServer extends UnicastRemoteObject implements RmiClientInterface
 			System.out.println(u.getName());
 		}
 		return users;
+		
+	}
+	
+	public boolean checkPrivilege(String username) throws RemoteException{
+		
+		for(User user: users) {
+			if(user.getName().equalsIgnoreCase(username)) {
+				if(user.getPrivilege().equalsIgnoreCase("editor")){
+					System.out.println(user.getPrivilege());
+					return true;
+				}else
+					return false;
+				
+			}else {
+				return false;
+			}
+			
+		}
+		
+		return false;
 		
 	}
 	

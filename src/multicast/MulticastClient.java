@@ -72,7 +72,7 @@ class MulticastUser extends Thread {
                 byte[] buffer = readKeyboard.getBytes();
 
                 InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, 1099);
                 socket.send(packet);
             }
         } catch (IOException e) {

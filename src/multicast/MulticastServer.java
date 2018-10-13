@@ -1,25 +1,28 @@
 package multicast;
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
+
 import java.net.MulticastSocket;
-import java.net.UnknownHostException;
 import java.util.Scanner;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.io.IOException;
 
-
-public class MulticastServer extends Thread{
-    private String MULTICAST_ADDRESS = "224.0.224.0";
+public class MulticastServer extends Thread {
+    private String MULTICAST_ADDRESS = "224.3.2.1";
     private int PORT = 4321;
 
     public static void main(String[] args) {
-        MulticastServer client = new MulticastServer();
-        client.start();
-        MulticastUser user = new MulticastUser();
-        user.start();
+        MulticastServer server = new MulticastServer();
+        server.start();
+       
     }
-    
+
+    public MulticastServer() {
+        super("Server " + (long) (Math.random() * 1000));
+    }
+
     public void run() {
-        MulticastSocket socket = null;
+    	MulticastSocket socket = null;
         try {
             socket = new MulticastSocket(PORT);  // create socket and bind it
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
@@ -32,6 +35,8 @@ public class MulticastServer extends Thread{
                 System.out.println("Received packet from " + packet.getAddress().getHostAddress() + ":" + packet.getPort() + " with message:");
                 String message = new String(packet.getData(), 0, packet.getLength());
                 System.out.println(message);
+                
+                
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -41,32 +46,6 @@ public class MulticastServer extends Thread{
     }
 }
 
-class MulticastServers extends Thread {
-    private String MULTICAST_ADDRESS = "224.0.224.0";
-    private int PORT = 4321;
 
-    public MulticastServers() {
-        super("User " + (long) (Math.random() * 1000));
-    }
 
-    public void run() {
-        MulticastSocket socket = null;
-        System.out.println(this.getName() + " ready...");
-        try {
-            socket = new MulticastSocket();  // create socket without binding it (only for sending)
-            Scanner keyboardScanner = new Scanner(System.in);
-            while (true) {
-                String readKeyboard = keyboardScanner.nextLine();
-                byte[] buffer = readKeyboard.getBytes();
 
-                InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                socket.send(packet);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            socket.close();
-        }
-    }
-}
