@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Scanner;
+
+import classes.User;
 
 public class RMIClient{
 	
@@ -14,6 +17,7 @@ public class RMIClient{
 	public static String username,password;
 	
 	public static void principalMenu() throws IOException {
+		
 		System.out.println("--------------Welcome to DropMusic----------------");
 		System.out.println("Já tem uma conta? [sim ou nao]");
 		keyboard =new Scanner(System.in);
@@ -361,7 +365,8 @@ public class RMIClient{
 		// TODO Auto-generated method stub		
 	}
 	
-	public static void login() {
+	public static void login() throws RemoteException{
+		ArrayList<User> users;
 		System.out.println("--------------Login----------------");
 		System.out.print("Username: ");
 		keyboard =new Scanner(System.in);
@@ -370,13 +375,25 @@ public class RMIClient{
 		password = keyboard.next();
 		System.out.println("Username: "+username);
 		System.out.println("Password: "+password);
+		
+		if(username.equalsIgnoreCase("admin")&&password.equalsIgnoreCase("admin")) {
+		
+			users = rmi_interface.registerUsers(username, password, "editor", "Administrador");
+			for(User u:users)
+				System.out.println(u.getName());
+		
+		
+			
+		}else {
+			//check if username is in users list
+		}
 		//depois de verificar tudo vai para o menu
 
 	
 
 	}
 	
-	public static void registerUser() {
+	public static void registerUser() throws RemoteException {
 		System.out.println("--------------Registar Utilizador----------------");
 		System.out.print("Nome: ");
 		keyboard =new Scanner(System.in);
@@ -391,7 +408,13 @@ public class RMIClient{
 		System.out.println(username);
 		System.out.println(password);
 		System.out.println(privillege);
-
+		ArrayList<User> users;
+		//fazer if para verificar se o usename não consta na lista de users
+		users=rmi_interface.registerUsers(username, password, privillege, name);
+		for(User u: users) {
+			System.out.println(u.getName());
+			System.out.println(u.getUsername());
+		}
 	}
 	
 	public static void main(String args[]) throws Exception, NotBoundException {
